@@ -7,13 +7,14 @@ class FunctionTest:
     @staticmethod
     def run(**kwargs):
         is_null_check(kwargs)
-        methods = kwargs.get("methods")
+        methods = kwargs.get("api_methods")
+
         if methods == "GET":
             response = requests.get(kwargs.get("api_url"))
         elif methods == "POST":
             response = requests.post(kwargs.get("api_url"),
                                      data=json.dumps(kwargs.get("api_param")),
-                                     headers=kwargs.get("api_content_type"))
+                                     headers={"Content-Type":kwargs.get("api_content_type")})
         else:
             raise Exception("methods type do not support")
 
