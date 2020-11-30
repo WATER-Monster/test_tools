@@ -18,7 +18,7 @@
 ```json
 {
   "user_name":"admin",
-  "pwd":"123"
+  "pwd":123
 }
 ```
 [//]:param
@@ -61,7 +61,7 @@
 ```json
 {
   "user_name":"admin",
-  "pwd":"124"
+  "pwd":124
 }
 ```
 [//]: param
