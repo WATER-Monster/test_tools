@@ -6,12 +6,12 @@ import requests
 from concurrent.futures import ThreadPoolExecutor
 
 
-pool = ThreadPoolExecutor(multiprocessing.cpu_count()*10)
+pool = ThreadPoolExecutor(multiprocessing.cpu_count()*50) # 这个常量其实可以越大越好，反正都是IO密集，运行起来都是扔进池子wait。如果太小，反而会因为block耗时导致任务整体耗时变长
 
 class StressTest:
-    def run(self, thread_count=4, task_count=4, **kwargs):
+    def run(self, thread_count=1, task_count=1, **kwargs):
         """
-        :param thread_count: 执行并发任务的线程数
+        :param thread_count: 执行并发任务的线程数(建议为CPU核数)
         :param task_count: 每个线程执行req请求的次数
         :return:
         """
@@ -21,7 +21,7 @@ class StressTest:
             p.start()
 
         while not queue.full():
-            time.sleep(0.5)
+            time.sleep(0.1)
 
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._consumer(queue, thread_count*task_count))
@@ -46,14 +46,17 @@ class StressTest:
         loop.run_until_complete(self._worker(url, loop, task_count, queue))
 
     async def _worker(self, url, loop, task_count, queue):
-        tasks = [asyncio.ensure_future(self._req_one(url,loop,queue)) for _ in range(task_count)]
+        s = requests.Session()
+        tasks = [asyncio.ensure_future(self._req_one(url,loop,queue,s)) for _ in range(task_count)]
         result = await asyncio.gather(*tasks)
         return result
 
-    @staticmethod
-    async def _req_one(url, loop, queue):
+    async def _req_one(self, url, loop, queue,s):
         global pool
-        start = time.time()
-        await loop.run_in_executor(pool, requests.get, url)
-        end = time.time()
-        await queue.put((end-start))
+        res = await loop.run_in_executor(pool, self._wrap_request, url,s)
+        await queue.put(res)
+
+    @staticmethod
+    def _wrap_request(url, s):
+        res = s.get(url)
+        return res.elapsed.total_seconds()
