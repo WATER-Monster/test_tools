@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 class StressTest:
     def run(self, thread_count=10, task_count=100, **kwargs):
         """
+        # ？TODO 其实不妨调个AB去做
         :param thread_count: 执行并发任务的线程数(建议为CPU核数)
         :param task_count: 每个线程执行req请求的次数
         :return:
