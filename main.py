@@ -13,8 +13,8 @@ def run_test(file_path, is_func_test=True, is_stress_test=True):
             f_t_response = f.run(**api)
             print(f_t_response)
         if is_stress_test:
-            s = StressTest()
-            s_t_response = s.run(**api)
+            s = StressTest(**api)
+            s_t_response = s.run()
 
 
 if __name__ == '__main__':
