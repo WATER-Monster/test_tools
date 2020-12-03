@@ -31,9 +31,11 @@ class FunctionTest:
 
         if self.response.status_code == 200:
             self._loop_dict(self.doc_true_response, json.loads(self.response.text))
+        else:
+            self._loop_dict(self.doc_false_response, json.loads(self.response.text))
 
-            if len(self.wrong_list) == 0:
-                is_correct = True
+        if len(self.wrong_list) == 0:
+            is_correct = True
 
         return {
             "api_name": kwargs.get("api_name"),
@@ -41,7 +43,6 @@ class FunctionTest:
             "status": self.response.status_code,
             "wrong_list": self.wrong_list
         }
-
 
     # 递归json字典
     def _loop_dict(self, doc_t_r, response):
