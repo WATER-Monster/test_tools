@@ -30,29 +30,28 @@ class FunctionTest:
         is_correct = False
 
         if self.response.status_code == 200:
-            self._loop_dict(self.doc_true_response)
+            self._loop_dict(self.doc_true_response, json.loads(self.response.text))
 
             if len(self.wrong_list) == 0:
                 is_correct = True
 
-            return {
-                "api_name": kwargs.get("api_name"),
-                "is_correct": is_correct,
-                "status": self.response.status_code,
-                "wrong_list": self.wrong_list
-            }
-
         return {
             "api_name": kwargs.get("api_name"),
             "is_correct": is_correct,
-            "status": self.response.status_code
+            "status": self.response.status_code,
+            "wrong_list": self.wrong_list
         }
 
-    # TODO 记忆化递归
-    def _loop_dict(self, doc_val, res_val, doc_key=None, res_key=None):
-        for key, val in doc_val.items():
-            if isinstance(val, dict):
-                self._loop_dict(doc_val=val, doc_key=key)
+
+    # 递归json字典
+    def _loop_dict(self, doc_t_r, response):
+        if doc_t_r is None or response is None:
+            return
+        for item in doc_t_r:
+            if isinstance(doc_t_r.get(item), dict):
+                self._loop_dict(doc_t_r.get(item), response.get(item))
                 continue
-            if val != "" and val != self.response.text.get(key):
-                self.wrong_list.append({key: self.response.text.get(key)})
+            if doc_t_r[item] == "no-need-confirm":
+                continue
+            if doc_t_r[item] != response[item]:
+                self.wrong_list.append(item)
