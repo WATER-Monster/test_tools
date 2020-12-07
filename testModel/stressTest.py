@@ -16,9 +16,9 @@ class StressTest:
         self.api_methods = kwargs.get("api_methods")
         self.api_content_type = kwargs.get("api_content_type")
 
-    def run(self, thread_count=10, task_count=100):
+    def run(self, thread_count=4, task_count=10):
         """
-        # ？TODO 其实不妨调个AB去做
+        # TODO 目前TPS值不太准确
         :param thread_count: 执行并发任务的线程数(建议为CPU核数)
         :param task_count: 每个线程执行req请求的次数
         :return:
@@ -28,6 +28,7 @@ class StressTest:
         for _ in range(thread_count):
             p = threading.Thread(target=self._thread, args=(task_count, queue))
             p.start()
+            p.join()
 
         while not queue.full():
             time.sleep(0.1)
@@ -47,7 +48,7 @@ class StressTest:
             item = await queue.get()
             t += item
             queue.task_done()
-        print(t/c)
+        print(c/t)
 
     def _thread(self, task_count, queue):
         loop = asyncio.new_event_loop()
@@ -68,5 +69,5 @@ class StressTest:
         if self.api_methods == "GET":
             res = s.get(self.api_url)
         else:
-            res = s.post(self.api_url, data=json.loads(self.api_param), headers={"Content-Type":self.api_content_type})
+            res = s.post(self.api_url, data=json.dumps(self.api_param), headers={"Content-Type":self.api_content_type})
         return res.elapsed.total_seconds()

@@ -1,11 +1,13 @@
 from fileParser.markDown import MarkDownParser
 from testModel.functionTest import FunctionTest
 from testModel.stressTest import StressTest
+from testModel.fault_tolerance_test import FaultToleranceTest
 
 
-def run_test(file_path, is_func_test=True, is_stress_test=True):
+def run_test(file_path, is_func_test=True, is_stress_test=True, fault_test=True):
     api_lists = MarkDownParser.read(file_path)
     for api in api_lists:
+        print(api)
         if not isinstance(api, dict):
             raise TypeError("api params should be a dict")
         if is_func_test:
@@ -15,6 +17,9 @@ def run_test(file_path, is_func_test=True, is_stress_test=True):
         if is_stress_test:
             s = StressTest(**api)
             s_t_response = s.run()
+        if fault_test:
+            f = FaultToleranceTest(**api)
+            f.run()
 
 
 if __name__ == '__main__':

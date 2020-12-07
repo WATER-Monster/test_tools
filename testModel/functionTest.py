@@ -32,7 +32,10 @@ class FunctionTest:
         if self.response.status_code == 200:
             self._loop_dict(self.doc_true_response, json.loads(self.response.text))
         else:
-            self._loop_dict(self.doc_false_response, json.loads(self.response.text))
+            try:
+                self._loop_dict(self.doc_false_response, json.loads(self.response.text))
+            except Exception:
+                return self.response.text
 
         if len(self.wrong_list) == 0:
             is_correct = True

@@ -26,7 +26,7 @@ class MarkDownParser:
                     "api_name":api_name.group(1),
                     "api_url":api_url.group(1),
                     "api_methods":api_methods.group(1),
-                    "api_content_type":api_content_type.group(1),
+                    "api_content_type":api_content_type.group(1) if api_methods.group(1) == "POST" else "",
                     "api_param":eval(api_param),
                     "api_res_true":eval(api_res_true),
                     "api_res_false":eval(api_res_false)
