@@ -1,9 +1,9 @@
 import string
-
+from config import PARAM_N
 import requests
 import json
 import random
-from isNullCheck import is_null_check
+from utils.isNullCheck import is_null_check
 
 
 allow_methods = ["GET", "POST"]
@@ -36,8 +36,8 @@ class FaultToleranceTest:
         return res.text
 
     def run(self):
-        # self._interface_test()
-        self._data_type_test(10)
+        self._interface_test()
+        self._data_type_test(PARAM_N)
 
     def _interface_test(self,):
         """

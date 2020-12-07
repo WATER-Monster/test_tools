@@ -1,11 +1,10 @@
 import json
-import multiprocessing
 import threading
 import asyncio
 import time
 import requests
 from concurrent.futures import ThreadPoolExecutor
-from isNullCheck import is_null_check
+from utils.isNullCheck import is_null_check
 
 
 class StressTest:

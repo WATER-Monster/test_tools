@@ -1,4 +1,4 @@
-from encodingFactory import EncodingFactory
+from utils.encodingFactory import EncodingFactory
 from config import *
 import re
 

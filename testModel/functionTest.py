@@ -1,4 +1,4 @@
-from isNullCheck import is_null_check
+from utils.isNullCheck import is_null_check
 import requests
 import json
 
