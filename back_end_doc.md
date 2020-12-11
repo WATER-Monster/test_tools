@@ -9,7 +9,7 @@
 
 > **url: http://localhost:5000/api/login**
 >
-> **methods:POST**
+> **methods:GET**
 >
 > **Content-Type:application/json**
 

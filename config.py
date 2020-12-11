@@ -7,3 +7,16 @@ API_RES_TRUE = r"\[//\]:[\s*]?True-response(.*)\[//\]:[\s*]?True-response"
 API_RES_FALSE = r"\[//\]:[\s*]?False-response(.*)\[//\]:[\s*]?False-response"
 
 PARAM_N = 10 # 容错测试中循环次数
+
+SQL_INJECTION_ARRAY = [
+    "'",
+    "N/A",
+    "' OR '1' = '1",
+    "') OR ('1' = '1",
+    "value' OR '1' = '2",
+    "value') OR ('1' = '2",
+    "' AND '1' = '2",
+    "') AND ('1' = '2",
+    "' OR 'ab' = 'a''b",
+    "') OR ('ab' = 'a''b"
+]
