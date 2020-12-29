@@ -1,10 +1,12 @@
 import string
+import threading
 from copy import deepcopy
-from config import PARAM_N, SQL_INJECTION_ARRAY
+from config import PARAM_N, SQL_INJECTION_ARRAY, SPECIAL_CHAR_ARRAY
 import requests
 import json
 import random
 from utils.isNullCheck import is_null_check
+from concurrent.futures import ThreadPoolExecutor
 
 
 allow_methods = ["GET", "POST"]
@@ -44,8 +46,8 @@ class FaultToleranceTest:
         return res.text
 
     def run(self):
-        # self._interface_test()
-        # self._data_type_test(PARAM_N)
+        self._interface_test()
+        self._data_type_test(PARAM_N)
         self._sql_injection_test()
 
     def _interface_test(self):
@@ -55,9 +57,11 @@ class FaultToleranceTest:
         不同的methods验证
         :return:
         """
+        ret_list = list()
         for methods in allow_methods:
             res = self._request(url=self.api_url,methods=methods,param=self.api_param,content_type=self.api_content_type)
-            print(res)
+            ret_list.append(res)
+        return ret_list
 
     def _data_type_test(self, n):
         """
@@ -67,11 +71,12 @@ class FaultToleranceTest:
         走N次访问测试，每次都使用随机参数类型，只要N足够多，就能基本覆盖。
         :return:
         """
+        ret_list = list()
         for _ in range(n):
             param = {k:self._get_random_value() for k in self.api_param}
             res = self._request(url=self.api_url, param=param, methods=self.api_methods, content_type=self.api_content_type)
-            print(param)
-            print(res)
+            ret_list.append([param, res])
+        return ret_list
 
     @staticmethod
     def _get_random_value(t=None):
@@ -132,7 +137,25 @@ class FaultToleranceTest:
             self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
                           content_type=self.api_content_type)
 
+    def _special_char_test(self):
+        """
+        str参数特殊字符测试
+        :return:
+        """
+        for char in SPECIAL_CHAR_ARRAY:
+            for param in self.api_param:
+                if isinstance(param, str):
+                    temp_param = deepcopy(self.api_param)
+                    temp_param[param] += char
+                    print(temp_param)
+                    res = self._request(url=self.api_url,methods=self.api_methods,param=temp_param,content_type=self.api_content_type)
+                    print(res)
+
     def _sql_injection_test(self):
+        """
+        sql注入测试
+        :return:
+        """
         for sql in SQL_INJECTION_ARRAY:
             for param in self.api_param:
                 temp_param = deepcopy(self.api_param)
@@ -140,3 +163,16 @@ class FaultToleranceTest:
                 print(temp_param)
                 res = self._request(url=self.api_url,methods=self.api_methods,param=temp_param,content_type=self.api_content_type)
                 print(res)
+
+    def _concurrent_test(self, thread_count=10):
+        """
+        接口并发正确性测试
+        在对重复提交会修改某一值的接口，用多线程并发请求，记录接口返回情况和并发线程数。
+        :return:
+        """
+        count = 0
+        while count <= thread_count:
+            p = threading.Thread(self._request(url=self.api_url,methods=self.api_methods,param=self.api_param,content_type=self.api_content_type))
+            p.start()
+            count += 1
+        return count

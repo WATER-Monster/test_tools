@@ -27,7 +27,6 @@ class StressTest:
         for _ in range(thread_count):
             p = threading.Thread(target=self._thread, args=(task_count, queue))
             p.start()
-            p.join()
 
         while not queue.full():
             time.sleep(0.1)
