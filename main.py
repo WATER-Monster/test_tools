@@ -11,10 +11,8 @@ def run_test(file_path, is_func_test=True, is_stress_test=True, fault_test=True)
         if not isinstance(api, dict):
             raise TypeError("api params should be a dict")
         if is_func_test:
-            f = FunctionTest()
-            f_t_response = f.run(**api)
-            t = TextOutput(**api)
-            t.out_put(f_t_response)
+            f = FunctionTest(**api)
+            f.run(**api)
         # if is_stress_test:
         #     s = StressTest(**api)
         #     s_t_response = s.run()

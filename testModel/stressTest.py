@@ -4,6 +4,7 @@ import asyncio
 import time
 import requests
 from concurrent.futures import ThreadPoolExecutor
+from docOutput.textOutput import TextOutput
 from utils.isNullCheck import is_null_check
 
 
@@ -14,10 +15,11 @@ class StressTest:
         self.api_param = kwargs.get("api_param")
         self.api_methods = kwargs.get("api_methods")
         self.api_content_type = kwargs.get("api_content_type")
+        self.docOutput = TextOutput(api_test_name="StressTest",**kwargs)
 
     def run(self, thread_count=4, task_count=10):
         """
-        # TODO 目前TPS值不太准确
+        # 目前TPS值不太准确  更新：其实是准确的。服务处理多个user的请求时头几个是会比较慢。第一个接口的tps就是这么被拉下来的
         :param thread_count: 执行并发任务的线程数(建议为CPU核数)
         :param task_count: 每个线程执行req请求的次数
         :return:
@@ -35,18 +37,16 @@ class StressTest:
         loop.run_until_complete(self._consumer(queue, thread_count*task_count))
 
     async def _consumer(self,queue,c):
-        consumer = asyncio.ensure_future(self._consume(queue,c))
+        asyncio.ensure_future(self._consume(queue,c))
         await queue.join()
-        consumer.cancel()
 
-    @staticmethod
-    async def _consume(queue,c):
+    async def _consume(self, queue,c):
         t = 0
         while not queue.empty():
             item = await queue.get()
             t += item
             queue.task_done()
-        print(c/t)
+        self.docOutput.out_put(TPS=c/t, oth=0)
 
     def _thread(self, task_count, queue):
         loop = asyncio.new_event_loop()
