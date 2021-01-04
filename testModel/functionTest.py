@@ -22,7 +22,7 @@ class FunctionTest:
         methods = kwargs.get("api_methods")
 
         if methods == "GET":
-            self.response = requests.get(kwargs.get("api_url"))
+            self.response = requests.get(kwargs.get("api_url"),params=kwargs.get("api_param"))
         elif methods == "POST":
             self.response = requests.post(kwargs.get("api_url"),
                                      data=json.dumps(kwargs.get("api_param")),
@@ -42,23 +42,24 @@ class FunctionTest:
             try:
                 self._loop_dict(self.doc_false_response, json.loads(self.response.text))
             except Exception:
-                return self.response.text
+                self.docOutput.out_put(**{
+                    "api_name": kwargs.get("api_name"),
+                    "doc_correct": is_correct,
+                    "msg": self.response.text,
+                    "status": self.response.status_code,
+                })
+                return
 
         if len(self.wrong_list) == 0:
             is_correct = True
 
         self.docOutput.out_put(**{
             "api_name": kwargs.get("api_name"),
-            "is_correct": is_correct,
+            "doc_correct": is_correct,
+            "msg": self.response.text,
             "status": self.response.status_code,
             "wrong_list": self.wrong_list
         })
-        return {
-            "api_name": kwargs.get("api_name"),
-            "is_correct": is_correct,
-            "status": self.response.status_code,
-            "wrong_list": self.wrong_list
-        }
 
     # 递归json字典
     def _loop_dict(self, doc_t_r, response):
@@ -68,7 +69,10 @@ class FunctionTest:
             if isinstance(doc_t_r.get(item), dict):
                 self._loop_dict(doc_t_r.get(item), response.get(item))
                 continue
-            if doc_t_r[item] == "no-need-confirm":
+            if doc_t_r.get(item) == "no-need-confirm":
                 continue
-            if doc_t_r[item] != response[item]:
-                self.wrong_list.append(item)
+            if doc_t_r.get(item) != response.get(item):
+                self.wrong_list.append({"key":item,
+                                        "wrong_place":doc_t_r,
+                                        "doc_value":doc_t_r.get(item),
+                                        "response_value":response.get(item)})
