@@ -5,6 +5,7 @@ from config import PARAM_N, SQL_INJECTION_ARRAY, SPECIAL_CHAR_ARRAY
 import requests
 import json
 import random
+from docOutput.textOutput import TextOutput
 from utils.isNullCheck import is_null_check
 from concurrent.futures import ThreadPoolExecutor
 
@@ -23,6 +24,7 @@ class FaultToleranceTest:
         self.api_param = kwargs.get("api_param")
         self.api_methods = kwargs.get("api_methods")
         self.api_content_type = kwargs.get("api_content_type")
+        self.docOutput = TextOutput(api_test_name="FaultToleranceTest", **kwargs)
 
     @staticmethod
     def _request(**kwargs):
@@ -46,9 +48,12 @@ class FaultToleranceTest:
         return res.text
 
     def run(self):
-        self._interface_test()
-        self._data_type_test(PARAM_N)
-        self._sql_injection_test()
+        # self._interface_test()
+        # self._data_type_test(PARAM_N)
+        # self._data_range_test()
+        # self._sql_injection_test()
+        self._special_char_test()
+        # self._concurrent_test()
 
     def _interface_test(self):
         """
@@ -57,11 +62,9 @@ class FaultToleranceTest:
         不同的methods验证
         :return:
         """
-        ret_list = list()
         for methods in allow_methods:
             res = self._request(url=self.api_url,methods=methods,param=self.api_param,content_type=self.api_content_type)
-            ret_list.append(res)
-        return ret_list
+            self.docOutput.out_put(response=res, Method=methods)
 
     def _data_type_test(self, n):
         """
@@ -71,12 +74,10 @@ class FaultToleranceTest:
         走N次访问测试，每次都使用随机参数类型，只要N足够多，就能基本覆盖。
         :return:
         """
-        ret_list = list()
         for _ in range(n):
             param = {k:self._get_random_value() for k in self.api_param}
             res = self._request(url=self.api_url, param=param, methods=self.api_methods, content_type=self.api_content_type)
-            ret_list.append([param, res])
-        return ret_list
+            self.docOutput.out_put(response=res, Param=param)
 
     @staticmethod
     def _get_random_value(t=None):
@@ -104,38 +105,44 @@ class FaultToleranceTest:
         :return:
         """
         for param in self.api_param:
-            self._data_range_factory(param)
+            self.__data_range_factory(param)
 
-    def _data_range_factory(self, param):
+    def __data_range_factory(self, param):
         # step1 空值测试
         # step2 极大值越界测试
-        if isinstance(param, str):
+        if isinstance(self.api_param.get(param), str):
             temp_param = deepcopy(self.api_param)
             temp_param[param] = ""
-            self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
+            res = self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
                           content_type=self.api_content_type)
             # string 的极大值理论可以无限大，做个极大的string参数输入实质算是服务器攻击了，这里跳过，
             # 但服务器编程时需要知道过大的request_body需要直接拦截掉，一般的框架都会有 MAX_CONTENT_LENGTH 之类的请求大小限制，也可以在Nginx做相关配置
+            self.docOutput.out_put(response=res, Param=temp_param)
             pass
-        elif isinstance(param, int):
+        elif isinstance(self.api_param.get(param), int):
             temp_param = deepcopy(self.api_param)
             temp_param[param] = 0
-            self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
+            res = self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
                           content_type=self.api_content_type)
+            self.docOutput.out_put(response=res, Param=temp_param)
             temp_param[param] = 9223372036854775808 # 扔一个比__int64大1的值过去
-            self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
+            res = self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
                           content_type=self.api_content_type)
+            self.docOutput.out_put(response=res, Param=temp_param)
             temp_param[param] = 18446744073709551616 # 扔一个比unsigned__int64大1的值过去
-            self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
+            res = self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
                           content_type=self.api_content_type)
-        elif isinstance(param, float):
+            self.docOutput.out_put(response=res, Param=temp_param)
+        elif isinstance(self.api_param.get(param), float):
             temp_param = deepcopy(self.api_param)
             temp_param[param] = float(0)
-            self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
+            res = self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
                           content_type=self.api_content_type)
+            self.docOutput.out_put(response=res, Param=temp_param)
             temp_param[param] = float("inf") # 扔一个float 64 的最大值。float("inf") 即float infinite。
-            self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
+            res = self._request(url=self.api_url, param=temp_param, methods=self.api_methods,
                           content_type=self.api_content_type)
+            self.docOutput.out_put(response=res, Param=temp_param)
 
     def _special_char_test(self):
         """
@@ -144,12 +151,11 @@ class FaultToleranceTest:
         """
         for char in SPECIAL_CHAR_ARRAY:
             for param in self.api_param:
-                if isinstance(param, str):
+                if isinstance(self.api_param.get(param), str):
                     temp_param = deepcopy(self.api_param)
                     temp_param[param] += char
-                    print(temp_param)
                     res = self._request(url=self.api_url,methods=self.api_methods,param=temp_param,content_type=self.api_content_type)
-                    print(res)
+                    self.docOutput.out_put(response=res, Param=temp_param)
 
     def _sql_injection_test(self):
         """
@@ -160,9 +166,8 @@ class FaultToleranceTest:
             for param in self.api_param:
                 temp_param = deepcopy(self.api_param)
                 temp_param[param] = sql
-                print(temp_param)
                 res = self._request(url=self.api_url,methods=self.api_methods,param=temp_param,content_type=self.api_content_type)
-                print(res)
+                self.docOutput.out_put(response=res, Param=temp_param)
 
     def _concurrent_test(self, thread_count=10):
         """
