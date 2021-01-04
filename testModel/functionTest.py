@@ -42,13 +42,7 @@ class FunctionTest:
             try:
                 self._loop_dict(self.doc_false_response, json.loads(self.response.text))
             except Exception:
-                self.docOutput.out_put(**{
-                    "api_name": kwargs.get("api_name"),
-                    "doc_correct": is_correct,
-                    "msg": self.response.text,
-                    "status": self.response.status_code,
-                })
-                return
+                pass
 
         if len(self.wrong_list) == 0:
             is_correct = True

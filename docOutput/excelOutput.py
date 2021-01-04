@@ -8,5 +8,5 @@ class ExcelOutput(DocOutputFactory):
         pass
 
     def excel_exist(self):
-        if not os.path.exists("excel"):
-            os.mkdir("excel")
+        if not os.path.exists("ExcelOut"):
+            os.mkdir("ExcelOut")
