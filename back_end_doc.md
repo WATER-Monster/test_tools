@@ -61,7 +61,7 @@
 ```json
 {
   "user_name":"admin",
-  "pwd":124
+  "pwd":123
 }
 ```
 [//]: param
@@ -99,10 +99,10 @@
 
 #### 入参
 [//]: param
-```
+```text
 {
   "user_name":"admin",
-  "pwd":124
+  "pwd":123
 }
 ```
 [//]: param
@@ -113,7 +113,7 @@
 ```json
 {
     "code": 200, 
-    "data": {"code": 100, "token": "no-need-confirm"}, 
+    "data": {"u_code": 100, "token": "no-need-confirm"}, 
     "msg": "ok"
 }
 ```
@@ -125,7 +125,7 @@
 {
     "code": 400, 
     "data": {}, 
-    "msg": "some-exception"
+    "msg": "user_name or pwd wrong"
 }
 ```
 [//]:False-response
