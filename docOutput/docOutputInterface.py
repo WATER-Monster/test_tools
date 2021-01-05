@@ -15,15 +15,15 @@ class DocOutputFactory(metaclass=abc.ABCMeta):
             for key,val in dict1.items():
                 if key == "Param" or key == "Method" or key == "Content-Type":
                     continue
-                s+=key+(" "*(12-len(key) if len(key)<=12 else 0))+": "
+                s+="\033[0;31m"+key+(" "*(12-len(key) if len(key)<=12 else 0))+": \033[0m"
                 s+=str(val)+"\n"
             return s
 
-        print("TestName    : "+self.test_name,
-              "Url         : "+self.api_url,
-              "Param       : "+(str(self.api_param) if kwargs.get("Param") is None else str(kwargs.get("Param"))),
-              "Method      : "+(self.api_methods if kwargs.get("Method") is None else kwargs.get("Method")),
-              "Content-Type: "+((self.api_content_type if self.api_content_type else "null") if kwargs.get("Content-Type") is None else kwargs.get("Content-Type")),
+        print("\033[1;31mTestName    : "+self.test_name + "\033[0m",
+              "\033[0;31mUrl         : "+self.api_url + "\033[0m",
+              "\033[0;31mParam       : \033[0m"+(str(self.api_param) if kwargs.get("Param") is None else str(kwargs.get("Param"))),
+              "\033[0;31mMethod      : \033[0m"+(self.api_methods if kwargs.get("Method") is None else kwargs.get("Method")),
+              "\033[0;31mContent-Type: \033[0m"+((self.api_content_type if self.api_content_type else "null") if kwargs.get("Content-Type") is None else kwargs.get("Content-Type")),
               get_dict(kwargs),
               sep="\n")
 
