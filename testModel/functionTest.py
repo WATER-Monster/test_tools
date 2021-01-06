@@ -7,32 +7,31 @@ import json
 class FunctionTest:
     def __init__(self, **kwargs):
         is_null_check(kwargs)
+        self.api_name = kwargs.get("api_name")
         self.api_url = kwargs.get("api_url")
         self.api_param = kwargs.get("api_param")
         self.api_methods = kwargs.get("api_methods")
         self.api_content_type = kwargs.get("api_content_type")
 
-        self.doc_true_response = None
-        self.doc_false_response = None
+        self.doc_true_response = kwargs.get("api_res_true")
+        self.doc_false_response = kwargs.get("api_res_false")
         self.response = None
         self.wrong_list = list()
         self.docOutput = TextOutput(api_test_name="FunctionTest",**kwargs)
 
-    def run(self, **kwargs):
-        methods = kwargs.get("api_methods")
-
-        if methods == "GET":
-            self.response = requests.get(kwargs.get("api_url"),params=kwargs.get("api_param"))
-        elif methods == "POST":
-            self.response = requests.post(kwargs.get("api_url"),
-                                     data=json.dumps(kwargs.get("api_param")),
-                                     headers={"Content-Type":kwargs.get("api_content_type")})
+    def run(self):
+        if self.api_methods == "GET":
+            self.response = requests.get(self.api_url,self.api_param)
+        elif self.api_methods == "POST":
+            self.response = requests.post(self.api_url,
+                                     data=json.dumps(self.api_param),
+                                     headers={"Content-Type":self.api_content_type})
         else:
             raise Exception("methods type do not support")
 
         # 对比response和文档中提取出的正确回参和错误回参
-        self.doc_true_response = {key:value for key, value in kwargs.get("api_res_true").items()}
-        self.doc_false_response = {key:value for key, value in kwargs.get("api_res_false").items()}
+        self.doc_true_response = {key:value for key, value in self.doc_true_response.items()}
+        self.doc_false_response = {key:value for key, value in self.doc_false_response.items()}
 
         is_correct = False
 
@@ -48,7 +47,7 @@ class FunctionTest:
             is_correct = True
 
         self.docOutput.out_put(**{
-            "api_name": kwargs.get("api_name"),
+            "api_name": self.api_name,
             "doc_correct": is_correct,
             "msg": self.response.text,
             "status": self.response.status_code,

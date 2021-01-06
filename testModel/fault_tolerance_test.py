@@ -7,7 +7,6 @@ import json
 import random
 from docOutput.textOutput import TextOutput
 from utils.isNullCheck import is_null_check
-from concurrent.futures import ThreadPoolExecutor
 
 
 allow_methods = ["GET", "POST"]
@@ -48,10 +47,10 @@ class FaultToleranceTest:
         return res.text
 
     def run(self):
-        # self._interface_test()
-        # self._data_type_test(PARAM_N)
-        # self._data_range_test()
-        # self._sql_injection_test()
+        self._interface_test()
+        self._data_type_test(PARAM_N)
+        self._data_range_test()
+        self._sql_injection_test()
         self._special_char_test()
         # self._concurrent_test()
 
@@ -169,10 +168,12 @@ class FaultToleranceTest:
                 res = self._request(url=self.api_url,methods=self.api_methods,param=temp_param,content_type=self.api_content_type)
                 self.docOutput.out_put(response=res, Param=temp_param)
 
-    def _concurrent_test(self, thread_count=10):
+    def _concurrent_test(self, test_param, thread_count=10):
         """
-        接口并发正确性测试
+        接口并发正确性测试(幂等测试)
         在对重复提交会修改某一值的接口，用多线程并发请求，记录接口返回情况和并发线程数。
+        # TODO 很难通用，暂时不改也不打开
+        :param: test_param 幂等测试中会发生重复修改的参数
         :return:
         """
         count = 0

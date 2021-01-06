@@ -5,7 +5,7 @@ from docOutput.docOutputInterface import DocOutputFactory
 
 class TextOutput(DocOutputFactory):
     def write_line(self, **kwargs):
-        if not os.path.exists("/TextOut"):
+        if not os.path.exists("TextOut"):
             os.mkdir("TextOut")
 
         date = datetime.datetime.now().strftime("%Y-%m-%d %H.%M")

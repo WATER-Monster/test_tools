@@ -46,7 +46,7 @@ class StressTest:
             item = await queue.get()
             t += item
             queue.task_done()
-        self.docOutput.out_put(TPS=c/t, oth=0)
+        self.docOutput.out_put(TPS=c/t)
 
     def _thread(self, task_count, queue):
         loop = asyncio.new_event_loop()
