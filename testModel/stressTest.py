@@ -15,9 +15,9 @@ class StressTest:
         self.api_param = kwargs.get("api_param")
         self.api_methods = kwargs.get("api_methods")
         self.api_content_type = kwargs.get("api_content_type")
-        self.docOutput = TextOutput(api_test_name="StressTest",**kwargs)
+        self.docOutput = TextOutput(api_test_name="StressTest",**kwargs).write_line
 
-    def run(self, thread_count=4, task_count=10):
+    def run(self, thread_count=4, task_count=100):
         """
         # 目前TPS值不太准确  更新：其实是准确的。服务处理多个user的请求时头几个是会比较慢。第一个接口的tps就是这么被拉下来的
         :param thread_count: 执行并发任务的线程数(建议为CPU核数)
@@ -46,7 +46,7 @@ class StressTest:
             item = await queue.get()
             t += item
             queue.task_done()
-        self.docOutput.out_put(TPS=c/t)
+        self.docOutput(TPS=c/t)
 
     def _thread(self, task_count, queue):
         loop = asyncio.new_event_loop()

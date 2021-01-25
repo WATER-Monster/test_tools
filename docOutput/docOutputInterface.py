@@ -16,7 +16,10 @@ class DocOutputFactory(metaclass=abc.ABCMeta):
                 if key == "Param" or key == "Method" or key == "Content-Type":
                     continue
                 s+="\033[0;31m"+key+(" "*(12-len(key) if len(key)<=12 else 0))+": \033[0m"
-                s+=str(val)+"\n"
+                try:
+                    s+=str(val).encode().decode("unicode_escape")+"\n"
+                except Exception:
+                    s += str(val) + "\n"
             return s
 
         print("\033[1;31mTestName    : "+self.test_name + "\033[0m",

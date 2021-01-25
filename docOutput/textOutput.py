@@ -5,17 +5,21 @@ from docOutput.docOutputInterface import DocOutputFactory
 
 class TextOutput(DocOutputFactory):
     def write_line(self, **kwargs):
+        self.out_put(**kwargs)
         if not os.path.exists("TextOut"):
             os.mkdir("TextOut")
 
-        date = datetime.datetime.now().strftime("%Y-%m-%d %H.%M")
+        date = datetime.datetime.now().strftime("%Y-%m-%d %H")
         text_path = "TextOut/%s.text" % date
 
         def get_dict(dict1):
             s = ""
             for key,val in dict1.items():
                 s+=key+(" "*(12-len(key) if len(key)<=12 else 0))+": "
-                s+=str(val)+"\n"
+                try:
+                    s+=str(val).encode().decode("unicode_escape")+"\n"
+                except Exception:
+                    s += str(val) + "\n"
             return s
 
         with open(text_path, "a+", encoding="UTF-8") as f:
