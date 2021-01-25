@@ -2,7 +2,8 @@ import abc
 
 
 class DocOutputFactory(metaclass=abc.ABCMeta):
-    def __init__(self, **kwargs):
+    def __init__(self,date, **kwargs):
+        self.date = date
         self.api_url = kwargs.get("api_url")
         self.api_param = kwargs.get("api_param")
         self.api_methods = kwargs.get("api_methods")

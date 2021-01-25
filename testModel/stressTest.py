@@ -9,13 +9,13 @@ from utils.isNullCheck import is_null_check
 
 
 class StressTest:
-    def __init__(self, **kwargs):
+    def __init__(self,date, **kwargs):
         is_null_check(kwargs)
         self.api_url = kwargs.get("api_url")
         self.api_param = kwargs.get("api_param")
         self.api_methods = kwargs.get("api_methods")
         self.api_content_type = kwargs.get("api_content_type")
-        self.docOutput = TextOutput(api_test_name="StressTest",**kwargs).write_line
+        self.docOutput = TextOutput(date=date,api_test_name="StressTest",**kwargs).write_line
 
     def run(self, thread_count=4, task_count=100):
         """

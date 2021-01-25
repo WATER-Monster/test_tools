@@ -5,7 +5,7 @@ import json
 
 
 class FunctionTest:
-    def __init__(self, **kwargs):
+    def __init__(self,date, **kwargs):
         is_null_check(kwargs)
         # self.api_name = kwargs.get("api_name")
         self.api_url = kwargs.get("api_url")
@@ -17,7 +17,7 @@ class FunctionTest:
         self.doc_false_response = kwargs.get("api_res_false")
         self.response = None
         self.wrong_list = list()
-        self.docOutput = TextOutput(api_test_name="FunctionTest",**kwargs).write_line
+        self.docOutput = TextOutput(date=date,api_test_name="FunctionTest",**kwargs).write_line
 
     def run(self):
         if self.api_methods == "GET":
