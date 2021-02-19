@@ -1,3 +1,4 @@
+from config import ANY_PARAM
 from docOutput.textOutput import TextOutput
 from utils.isNullCheck import is_null_check
 import requests
@@ -62,7 +63,7 @@ class FunctionTest:
             if isinstance(doc_t_r.get(item), dict):
                 self._loop_dict(doc_t_r.get(item), response.get(item))
                 continue
-            if doc_t_r.get(item) == "no-need-confirm":
+            if doc_t_r.get(item) == ANY_PARAM:
                 continue
             if doc_t_r.get(item) != response.get(item):
                 self.wrong_list.append({"key":item,
